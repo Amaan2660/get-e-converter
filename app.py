@@ -126,7 +126,7 @@ if raw_file:
 
         df_out = pd.DataFrame(rows, columns=template_cols)
         st.success(f"Generated {len(df_out)} rows ✓")
-        st.dataframe(df_out.head(10), height=300)
+        st.dataframe(df_out.head(40), height=300)
 
         # CSV download
         st.download_button(
