@@ -5,8 +5,10 @@ from datetime import timedelta
 from pathlib import Path
 
 # ----------------------
-# Helper configuration
+# Template file
 # ----------------------
+TEMPLATE_FILE = "template.csv"
+
 DEFAULT_HOTELS = {
     "Vester Søgade 6": "Scandic Copenhagen",
     "Falkoner Alle 9": "Scandic Falkoner",
@@ -27,12 +29,10 @@ PHONE_FILTER = "442038568655"
 # ----------------------
 
 def load_template(template_file: Path):
-    """Return ordered list of columns, always appending 'Customer Reference No'."""
     cols = list(pd.read_csv(template_file, nrows=0).columns)
     if "Customer Reference No" not in cols:
         cols.append("Customer Reference No")
     return cols
-
 
 def parse_excel_datetime(val):
     if pd.isna(val):
@@ -44,7 +44,6 @@ def parse_excel_datetime(val):
     except Exception:
         return None
 
-
 def map_address(addr, hotels):
     s = str(addr)
     for snippet, hotel in hotels.items():
@@ -54,14 +53,12 @@ def map_address(addr, hotels):
         return f"CPH Airport, {s}"
     return s
 
-
 def crew_mapping(pn, crew_rules):
     n = pn.lower()
     for pattern, (cust, code) in crew_rules:
         if re.search(pattern, n):
             return cust, code
     return "Get-e", "Get-e"
-
 
 def vehicle_type(vtype, pax):
     v = str(vtype).lower()
@@ -71,7 +68,6 @@ def vehicle_type(vtype, pax):
         return "Standard"
     return "People Carrier" if pax >= 4 else "Standard"
 
-
 def trim(text, limit):
     if pd.isna(text):
         return ""
@@ -79,44 +75,23 @@ def trim(text, limit):
     return t if len(t) <= limit else re.findall(rf"^.{{0,{limit}}}\b", t)[0].strip()
 
 # ----------------------
-# Prepare a hard‑coded 98‑column fallback list
+# Load template columns
 # ----------------------
-BASIC_COLS = [
-    "Customer", "Customer Code", "Pax Name", "Mobile 1", "Pick Up", "Drop Off",
-    "Pickup Time", "Flight", "Vehicle Type", "Adults", "Bags", "Pick Up Instructions",
-    "Base Rate", "Price", "Service Type", "Trip Status", "Payment Method",
-    "Customer Reference No", "Ref No"
-]
-
-# Fill up to 98 with placeholders (these stay blank but preserve column count)
-if len(BASIC_COLS) < 98:
-    BASIC_COLS += [f"Placeholder_{i}" for i in range(1, 99 - len(BASIC_COLS))]
+template_cols = load_template(TEMPLATE_FILE)
 
 # ----------------------
 # Streamlit UI
 # ----------------------
-
 st.set_page_config(page_title="GET‑E Import Generator", layout="wide")
 st.title("GET‑E Import File Generator")
 
-st.sidebar.header("Configuration")
-
-# 1️⃣  Template uploader
-uploaded_template = st.sidebar.file_uploader("Upload full 98‑column template CSV (optional)", type=["csv"])
-if uploaded_template:
-    template_cols = load_template(uploaded_template)
-    # remember for this session
-    st.session_state["template_cols"] = template_cols
-else:
-    template_cols = st.session_state.get("template_cols", BASIC_COLS)
-
-# 2️⃣  Raw XLSX uploader
+# Raw XLSX uploader
 raw_file = st.file_uploader("Upload GET‑E raw XLSX", type=["xlsx"])
 
 if raw_file:
     raw_df = pd.read_excel(raw_file)
-    st.write("Raw data preview (first 10 rows)")
-    st.dataframe(raw_df.head(10))
+    st.write("Raw data preview (first 40 rows)")
+    st.dataframe(raw_df.head(40))
 
     if st.button("Convert to Import CSV"):
         rows = []
@@ -150,14 +125,13 @@ if raw_file:
             rows.append(row)
 
         df_out = pd.DataFrame(rows, columns=template_cols)
-        st.success(f"Generated {len(df_out)} rows ✓ (using {len(template_cols)}‑column template)")
+        st.success(f"Generated {len(df_out)} rows ✓")
         st.dataframe(df_out.head(10), height=300)
 
-        # Provide CSV download
+        # CSV download
         st.download_button(
             label="Download import‑ready CSV",
             data=df_out.to_csv(index=False).encode(),
             file_name="GETE_Import.csv",
             mime="text/csv"
         )
-
