@@ -109,11 +109,7 @@ if raw_file:
                 "Pick Up": map_address(r["PICKUP_ADDRESS"], DEFAULT_HOTELS),
                 "Drop Off": map_address(r["DROP_OFF_ADDRESS"], DEFAULT_HOTELS),
                 "Pickup Time": pickup_time,
-                "Flight": (
-                    re.sub(r"^([a-zA-Z]{2})(\d+)", r"\1 \2", str(r["FLIGHT_NUMBER"]))
-                    if "airport" in str(r["PICKUP_ADDRESS"]).lower() and pd.notna(r["FLIGHT_NUMBER"])
-                    else ""
-                ),
+                "Flight": r["FLIGHT_NUMBER"] if "airport" in str(r["PICKUP_ADDRESS"]).lower() else "",
                 "Vehicle Type": vehicle_type(r["VEHICLE_TYPE"], r["AMOUNT_PASSENGERS"]),
                 "Adults": int(r["AMOUNT_PASSENGERS"]),
                 "Bags": int(r["AMOUNT_LUGGAGE"]) if not pd.isna(r["AMOUNT_LUGGAGE"]) else 0,
