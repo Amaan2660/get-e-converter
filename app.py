@@ -68,7 +68,7 @@ def vehicle_type(vtype, pax):
         return "Sedan"
     if "minibus" in v:
         return "Minibus"
-    return "Minibus" if pax >= 5 else return "Van" if pax >= 4 else return "Sedan"
+    return "Minibus" if pax >= 5 else ("Van" if pax >= 4 else "Sedan")
 
 def trim(text, limit):
     if pd.isna(text):
