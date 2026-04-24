@@ -65,7 +65,7 @@ def vehicle_type(vtype, pax):
     if "van" in v or "minivan" in v:
         return "Van"
     if "sedan" in v:
-        return "Standard"
+        return "Sedan"
     if "minibus" in v:
         return "Minibus"
     return "Minibus" if pax >= 5
