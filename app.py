@@ -63,10 +63,12 @@ def crew_mapping(pn, crew_rules):
 def vehicle_type(vtype, pax):
     v = str(vtype).lower()
     if "van" in v or "minivan" in v:
-        return "People Carrier"
+        return "Van"
     if "sedan" in v:
         return "Standard"
-    return "People Carrier" if pax >= 4 else "Standard"
+    if "minibus" in v:
+        return "Minibus"
+    return "Minibus" if pax >= 5
 
 def trim(text, limit):
     if pd.isna(text):
