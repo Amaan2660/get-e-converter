@@ -107,7 +107,7 @@ if raw_file:
                 "Customer": cust,
                 "Customer Code": code,
                 "Pax Name": trim(r["PASSENGER_NAME"], 50),
-                "Mobile 1": "" if str(r["CUSTOMER_CONTACT_NUMBER"]) == PHONE_FILTER else str(r["CUSTOMER_CONTACT_NUMBER"]),
+                "Mobile 1": "1" if str(r["CUSTOMER_CONTACT_NUMBER"]) == PHONE_FILTER else str(r["CUSTOMER_CONTACT_NUMBER"]),
                 "Pick Up": map_address(r["PICKUP_ADDRESS"], DEFAULT_HOTELS),
                 "Drop Off": map_address(r["DROP_OFF_ADDRESS"], DEFAULT_HOTELS),
                 "Pickup Time": pickup_time,
